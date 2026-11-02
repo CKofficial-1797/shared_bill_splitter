@@ -155,3 +155,26 @@ You must understand every line you submit. We check this with your video and in 
 5. Paste the repository link and the video link in the application form.
 
 We will run `pnpm install && pnpm check && pnpm typecheck && pnpm test` on your repository.
+
+
+## Decisions
+
+### 1. Cloudflare D1 for persistence
+I used Cloudflare D1, a SQLite-based database, because the application has a small relational data model: homes, members, bills, shares, and payment idempotency records. Foreign keys and database constraints help preserve relationships and reject invalid data. Indexes support common lookups, such as members by home and shares by payment status.
+
+### 2. Store money as integer paise
+Bill totals and shares are stored as integer paise rather than floating-point values. This avoids rounding errors and ensures that the shares add up exactly to the original bill total.
+
+### 3. Deterministic remainder distribution
+When a bill cannot be divided evenly, each member receives the base share, and the remaining paise are assigned one at a time to members in insertion order. This makes the split predictable and ensures that no paise are lost.
+
+### 4. Idempotency keys for payments
+Payment requests require an `Idempotency-Key`. The key is stored with the share and payment timestamp so that retrying the same request can return the original payment result instead of recording another payment. Reusing a key for a different share is rejected.
+
+### 5. Validation at the API and database layers
+The API validates request bodies and return consistent JSON errors with appropriate HTTP status codes. Database constraints provide a second layer of protection for required names,. positive bill totals, valid share amounts, and unique bill-member shares.
+
+
+## AI Usage
+
+I used ChatGPT for guidance while implementing and debugging the assignment. I reviewed the suggested code, adapted it to the project, and ran the typechecks, tests, and production build to verify the implementation.
