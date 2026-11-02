@@ -178,3 +178,5 @@ The API validates request bodies and return consistent JSON errors with appropri
 ## AI Usage
 
 I used ChatGPT for guidance while implementing and debugging the assignment. I reviewed the suggested code, adapted it to the project, and ran the typechecks, tests, and production build to verify the implementation.
+
+![architecture ](mermaid-diagram.png)
